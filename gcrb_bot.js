@@ -6,7 +6,7 @@ var knex = require('knex')(config.knex);
 var twit = require('twit');
 var tw = new twit(config.twitter);
 
-var table_name = 'gcrb';
+var table_name = 'gcrb_bot';
 
 var date = new Date();
 var currDate = date.toISOString().substr(0, 10);
@@ -209,7 +209,7 @@ function tweet(data) {
 	status += 'http://www.grac.or.kr/Statistics/Popup/Pop_ReasonInfo.aspx?' + aid;
 	
 	tw.post('statuses/update', {
-		status: '@se_noti ' + status
+		status: status
 	}, function(err, res) {
 		if(err) {
 			console.log(err);
