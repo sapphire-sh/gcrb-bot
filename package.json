@@ -1,0 +1,22 @@
+{
+  "name": "gcrb_bot",
+  "version": "0.0.1",
+  "description": "@gcrb_bot",
+  "main": "gcrb_bot.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sapphiredev/gcrb_bot.git"
+  },
+  "author": "sapphire <se.imas.kr@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sapphiredev/gcrb_bot/issues"
+  },
+  "homepage": "https://github.com/sapphiredev/gcrb_bot#readme",
+  "dependencies": {
+    "jsdom": "^7.2.1",
+    "knex": "^0.9.0",
+    "mysql": "^2.9.0",
+    "twit": "^2.1.1"
+  }
+}
