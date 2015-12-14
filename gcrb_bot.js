@@ -21,99 +21,64 @@ parse(0, 0);
 function parse(platformId, page) {
 	var platform = platforms[platformId];
 	if(platform === undefined) {
-		resolve();
+		insert();
 	}
 	else {
 		jsdom.env(
 			'http://www.grac.or.kr/Statistics/GameStatistics.aspx?type=search&enddate=' + currDate + '&startdate=' + prevDate + '&platform=' + platform + '&pageindex=' + page,
-			['https://code.jquery.com/jquery-2.1.4.min.js'],
 			function (err, window) {
-				var $ = window.$;
+				var rows = Array.from(window.document.querySelectorAll('.mt10 tbody tr'));
 				
-				var res = $('table.mt10 > tbody > tr > td');
-				
-				var count = 0;
-				
-				var aid;
-				var type = (platformId + 1);
-				var name;
-				var applicant;
-				var date;
-				var rating;
-				var code;
-				
-				if(res.size() > 1) {
-					res.each(function(i) {
-						switch(i % 12) {
-						case 0:
-							name = $(this).text().trim();
-							aid = $(this).html().split('(\'')[1].split('\')')[0];
-							break;
-						case 1:
-							applicant = $(this).text().trim();
-							break;
-						case 2:
-							date = $(this).text().trim().replace(/,/g, '-');
-							break;
-						case 4:
-							code = $(this).text().trim();
-							break;
-						case 3:
-							rating = $(this).html().match(/rating_[\w]+/);
-							if(rating === null) {
-								rating = -1;
-							}
-							else {
-								switch(rating[0].split('_')[1]) {
-								case 'all':
-									rating = 1;
-									break;
-								case '12':
-									rating = 2;
-									break;
-								case '15':
-									rating = 3;
-									break;
-								case '18':
-									rating = 4;
-									break;
-								default:
-									rating = 0;
+				rows.reduce(function(prev, curr) {
+					return prev.then(function() {
+						return new Promise(function(resolve, reject) {
+							var cols = Array.from(curr.querySelectorAll('td'));
+							if(cols.length === 12) {
+								var rating = cols[3].innerHTML.match(/rating_[\w]+/);
+								if(rating === null) {
+									rating = -1;
 								}
+								else {
+									switch(rating[0].split('_')[1]) {
+									case 'all':	rating = 1; break;
+									case '12':	rating = 2; break;
+									case '15':	rating = 3; break;
+									case '18':	rating = 4; break;
+									default:	rating = 0;
+									}
+								}
+								
+								data.push({
+									gr_aid: cols[0].innerHTML.split('(\'')[1].split('\')')[0],
+									gr_date: cols[2].textContent.trim().replace(/,/g, '-'),
+									gr_platform: platformId + 1,
+									gr_name: cols[0].textContent.trim(),
+									gr_applicant: cols[1].textContent.trim(),
+									gr_rating: rating,
+									gr_code: cols[4].textContent.trim(),
+									gr_tweet: rating === -1 ? 2 : 0
+								});
 							}
-							
-							break;
-						case 9:
-							data.push({
-								gr_aid: aid,
-								gr_date: date,
-								gr_platform: platformId + 1,
-								gr_name: name,
-								gr_applicant: applicant,
-								gr_rating: rating,
-								gr_code: code,
-								gr_tweet: rating === -1 ? 2 : 0
-							});
-							++count;
-							break;
-						}
+							resolve();
+						});
 					});
-				}
-				
-				if(count == 10) {
-					parse(platformId, page + 1);
-				}
-				else {
-					parse(platformId + 1, 0);
-				}
-				
-				window.close();
+				}, Promise.resolve())
+				.then(function() {
+					if(rows.length == 10) {
+						parse(platformId, page + 1);
+					}
+					else {
+						parse(platformId + 1, 0);
+					}
+					
+					window.close();
+				});
 			}
 		);
 	}
 }
 
-function resolve() {
+function insert() {
 	data.reduce(function(prev, curr) {
 		return prev.then(function() {
 			return knex(table_name)
@@ -154,7 +119,6 @@ function resolve() {
 }
 
 function tweet(data) {
-	console.log(data.gr_name);
 	var date = data.gr_date;
 	var name = data.gr_name;
 	
