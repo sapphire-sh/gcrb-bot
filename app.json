@@ -1,0 +1,4 @@
+{
+	"name": "@gcrb_bot",
+	"script": "./src/app.js"
+}

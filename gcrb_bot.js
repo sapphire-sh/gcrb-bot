@@ -19,11 +19,13 @@ var platforms = ['01', '03', '04', '05'];
 parse(0, 0);
 
 function parse(platformId, page) {
+console.log(platformId + ' ' + page);
 	var platform = platforms[platformId];
 	if(platform === undefined) {
 		insert();
 	}
 	else {
+console.log( 'http://www.grac.or.kr/Statistics/GameStatistics.aspx?type=search&enddate=' + currDate + '&startdate=' + prevDate + '&platform=' + platform + '&pageindex=' + page);
 		jsdom.env(
 			'http://www.grac.or.kr/Statistics/GameStatistics.aspx?type=search&enddate=' + currDate + '&startdate=' + prevDate + '&platform=' + platform + '&pageindex=' + page,
 			function (err, window) {
@@ -47,7 +49,6 @@ function parse(platformId, page) {
 									default:	rating = 0;
 									}
 								}
-								
 								data.push({
 									gr_aid: cols[0].innerHTML.split('(\'')[1].split('\')')[0],
 									gr_date: cols[2].textContent.trim().replace(/,/g, '-'),
@@ -79,6 +80,7 @@ function parse(platformId, page) {
 }
 
 function insert() {
+console.log(data);
 	data.reduce(function(prev, curr) {
 		return prev.then(function() {
 			return knex(table_name)
@@ -97,6 +99,7 @@ function insert() {
 		knex(table_name)
 		.where('gr_tweet', 0)
 		.then(function(rows) {
+console.log(rows);
 			rows.reduce(function(prev, curr) {
 				return prev.then(function() {
 					tweet(curr);
@@ -106,6 +109,7 @@ function insert() {
 				});
 			}, Promise.resolve())
 			.then(function() {
+console.log(1);
 				knex.destroy();
 			});
 		})
