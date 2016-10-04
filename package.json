@@ -5,25 +5,34 @@
   "main": "gcrb_bot.js",
   "scripts": {
     "start": "pm2 start ./app.json",
-    "stop": "pm2 stop ./app.json"
+    "stop": "pm2 stop ./app.json",
+    "test": "NODE_ENV=test mocha",
+    "test-coverage": "NODE_ENV=test istanbul cover _mocha",
+    "coveralls": "npm run test-coverage -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sapphiredev/gcrb_bot.git"
   },
-  "author": "sapphire <se.imas.kr@gmail.com>",
+  "author": "sapphire",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/sapphiredev/gcrb_bot/issues"
   },
   "homepage": "https://github.com/sapphiredev/gcrb_bot#readme",
   "dependencies": {
-    "jsdom": "^7.2.1",
+    "cheerio": "^0.22.0",
     "knex": "^0.9.0",
+    "lodash": "^4.16.3",
     "mysql": "^2.9.0",
     "node-schedule": "^1.1.0",
+    "request": "^2.75.0",
     "sqlite3": "^3.1.2",
-    "twit": "^2.1.1",
-    "underscore": "^1.8.3"
+    "twit": "^2.1.1"
+  },
+  "devDependencies": {
+    "coveralls": "^2.11.14",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.0"
   }
 }

@@ -1,4 +1,5 @@
 {
-	"name": "@gcrb_bot",
-	"script": "./src/app.js"
+  "name": "@gcrb_bot",
+  "script": "./src/app.js"
 }
+

@@ -27,4 +27,5 @@ build/Release
 node_modules
 
 config.js
-gcrb_bot.db
+*.sqlite
+.coveralls.yml
