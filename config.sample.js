@@ -9,6 +9,7 @@ module.exports = {
 		client: 'sqlite3',
 		connection: {
 			filename: './gcrb_bot.sqlite'
-		}
+		},
+		useNullAsDefault: true
 	}
 };
