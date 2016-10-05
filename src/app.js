@@ -3,7 +3,10 @@
 const config = require('../config');
 
 let knex = require('knex')(config.knex);
-let twit = new (require('twit'))(config.twitter);
+let twit;
+if(process.env.NODE_ENV !== 'test') {
+	twit = new (require('twit'))(config.twitter);
+}
 
 let request = require('request');
 let cheerio = require('cheerio');
