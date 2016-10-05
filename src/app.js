@@ -2,217 +2,263 @@
 
 const config = require('../config');
 
-let schedule = require('node-schedule');
 let knex = require('knex')(config.knex);
 let twit = new (require('twit'))(config.twitter);
 
-let _ = require('lodash');
 let request = require('request');
 let cheerio = require('cheerio');
 
-const TABLE_NAME = 'gcrb_bot';
+const platforms = [ '01', '03', '04', '05' ];
+const ratings = [ 'rating_all', 'rating_12', 'rating_15', 'rating_18', 'icon_reject', 'icon_cancel1', 'icon_cancel2' ];
+const table_name = 'gcrb_bot';
 
 class App {
 	constructor() {
 		let self = this;
 		
-		self.platforms = [ '01', '03', '04', '05' ];
 		
-		knex.schema.hasTable(TABLE_NAME)
-		.then((exists) => {
+		knex.schema.hasTable(table_name).then((exists) => {
 			if(exists) {
 				return Promise.resolve();
 			}
 			else {
-				return knex.schema.createTableIfNotExists(TABLE_NAME, (table) => {
-					table.increments();
-					table.string('aid').notNullable();
+				return knex.schema.createTableIfNotExists(table_name, (table) => {
+					table.string('id').primary().notNullable();
 					table.string('date').notNullable();
+					table.string('title').notNullable();
 					table.integer('platform').notNullable();
-					table.string('name').notNullable();
 					table.string('applicant').notNullable();
 					table.integer('rating').notNullable();
-					table.string('code').notNullable();
+					table.string('code');
 					table.integer('tweet', 1).notNullable();
 					table.timestamp('created_at').defaultTo(knex.fn.now());
 				});
 			}
-		})
-		.then(() => {
+		}).then(() => {
 			if(process.env.NODE_ENV !== "test") {
-				self.start();
-				schedule.scheduleJob('*/5 * * * *', self.start);
+				Promise.resolve(0).then(function loop(i) {
+					console.log(i);
+					
+					return self.start().then((data) => {
+						let promises = platforms.map((platform) => {
+							return self.parse(platform, data.startdate, data.enddate, data.page).then(function loop(data) {
+								if(data.items.length > 0) {
+									return self.insert(data.items).then(() => {
+										return self.parse(platform, data.startdate, data.enddate, data.page + 1).then(loop).catch((e) => {
+											console.log(e);
+										});
+									}).catch((e) => {
+										console.log(e);
+									});
+								}
+								else {
+									return Promise.resolve();
+								} 
+							});
+						});
+						return Promise.all(promises).then(() => {
+							return self.tweet();
+						}).then(() => {
+							return new Promise((resolve, reject) => {
+								setTimeout(() => {
+									resolve(i + 1);
+								}, 5 * 60 * 1000);
+							});
+						}).then(loop).catch((e) => {
+							console.log(e);
+						});
+					}).catch((e) => {
+						console.log(e);
+					});
+				});
 			}
+		}).catch((e) => {
+			console.log(e);
 		});
 	}
 	
 	start() {
 		let self = this;
 		
-		let promises = [];
-		self.platforms.forEach((platform) => {
-			promises.push(self.parse(platform, 0));
-		});
-		Promise.all(promises).then((values) => {
-			let games = _.flatten(values);
-			games = _.sortBy(games, (game) => {
-				return game.date + game.platform;
-			});
+		return new Promise((resolve, reject) => {
+			let date = new Date();
+			let enddate = date.toISOString().substr(0, 10);
+			date.setDate(date.getDate() - 3);
+			let startdate = date.toISOString().substr(0, 10);
 			
-			self.insert(games);
+			resolve({
+				startdate: startdate,
+				enddate: enddate,
+				page: 0
+			});
 		});
 	}
 	
-	parse(platform, page) {
+	parse(platform, startdate, enddate, page) {
 		let self = this;
 		
-		let date = new Date();
-		let currDate = date.toISOString().substr(0, 10);
-		date.setDate(date.getDate() - 3);
-		let prevDate = date.toISOString().substr(0, 10);
+		let data = {
+			items: [],
+			startdate: startdate,
+			enddate: enddate,
+			page: page
+		};
 		
-		page = (page === undefined ? 0 : page);
-		
-		const platformId = self.platforms.indexOf(platform) + 1;
-		const url = `http://www.grac.or.kr/Statistics/GameStatistics.aspx?type=search&enddate=${currDate}&startdate=${prevDate}&platform=${platform}&pageindex=${page}`;
+		const url = `http://www.grac.or.kr/Statistics/GameStatistics.aspx?type=search&enddate=${enddate}&startdate=${startdate}&platform=${platform}&pageindex=${page}`;
 		
 		return new Promise((resolve, reject) => {
 			request(url, (err, res, body) => {
-				try {
-					if(!err && res.statusCode === 200) {
-						let $ = cheerio.load(body);
-						
-						
-			jsdom.env(url, (err, window) => {
-					const rows = Array.from(window.document.querySelectorAll('.mt10 tbody tr'));
+				if(!err && res.statusCode === 200) {
+					let $ = cheerio.load(body);
 					
-					let data = [];
-					_.each(rows, (row) => {
-						const cols = Array.from(row.querySelectorAll('td'));
-						if(cols.length === 12) {
-							let rating = cols[3].innerHTML.match(/rating_[\w]+/);
-							if(rating === null) {
-								rating = -1;
-							}
-							else {
-								switch(rating[0].split('_')[1]) {
-								case 'all':	rating = 1; break;
-								case '12':	rating = 2; break;
-								case '15':	rating = 3; break;
-								case '18':	rating = 4; break;
-								default:	rating = 0;
-								}
-							}
+					let items = [];
+					$('table.statistics tr').each((i, e) => {
+						if(i > 0) {
+							let item = {};
 							
-							data.push({
-								aid: cols[0].innerHTML.split('(\'')[1].split('\')')[0],
-								date: cols[2].textContent.trim().replace(/,/g, '-'),
-								platform: platformId,
-								name: cols[0].textContent.trim(),
-								applicant: cols[1].textContent.trim(),
-								rating: rating,
-								code: cols[4].textContent.trim(),
-								tweet: rating === -1 ? 2 : 0
+							$(e).find('td').each((i, e) => {
+								let str = $(e).text().trim();
+								
+								item.platform = platforms.indexOf(platform);
+								item.tweet = 0;
+								
+								switch(i) {
+								case 0:
+									item.title = str;
+									
+									item.id = $(e).find('a').attr('href').split('\'')[1];
+									
+									break;
+								case 1:
+									item.applicant = str;
+									
+									break;
+								case 2:
+									item.date = str.replace(/,/g, '-');
+									
+									break;
+								case 3:
+									let rating = $(e).find('img').attr('src').split('/').pop().split('.').shift();
+									
+									item.rating = ratings.indexOf(rating);
+									
+									break;
+								case 4:
+									item.code = str;
+									
+									break;
+								}
 							});
+							
+							items.push(item);
 						}
 					});
 					
-					window.close();
-					
-					if(rows.length === 10) {
-						self.parse(platform, page + 1)
-						.then((rows) => {
-							data = _.union(rows, data);
-							resolve(data);
-						});
-					}
-					else {
-						resolve(data);
-					}
+					data.items = items;
+					resolve(data);
 				}
-			);
+				else {
+					resolve(data);
+				}
+			});
 		});
 	}
 	
-	insert(data) {
+	insert(items) {
 		let self = this;
 		
-		data.reduce((prev, curr) => {
-			return prev.then(() => {
-				return knex(TABLE_NAME)
-				.where('aid', curr.aid)
-				.then((rows) => {
+		return new Promise((resolve, reject) => {
+			let promises = items.map((item) => {
+				return knex(table_name).where({
+					id: item.id
+				}).then((rows) => {
 					if(rows.length === 0) {
-						return knex(TABLE_NAME).insert(curr);
+						return knex(table_name).insert(item);
 					}
 					else {
 						return Promise.resolve();
 					}
+				}).catch((e) => {
+					console.log(e);
 				});
 			});
-		}, Promise.resolve())
-		.then(() => {
-			knex(TABLE_NAME)
-			.where('tweet', 0)
-			.then((rows) => {
-				rows.reduce((prev, curr) => {
-					return prev.then(() => {
-						self.tweet(curr);
-						return knex(TABLE_NAME)
-						.where('id', curr.id)
-						.update('tweet', 1);
-					});
-				}, Promise.resolve())
-				.then(() => {});
-			})
-			.catch((err) => {
-				console.log(err);
+			Promise.all(promises).then(() => {
+console.log(1);
+				resolve();
+			}).catch((e) => {
+				console.log(e);
 			});
-		})
-		.catch((err) => {
-			console.log(err);
 		});
 	}
 	
-	tweet(data) {
-		let date = data.date;
-		let name = data.name;
-		let platform;
-		switch(data.platform) {
-			case 1: platform = 'PC/온라인 게임'; break;
-			case 2: platform = '비디오 게임'; break;
-			case 3: platform = '모바일 게임'; break;
-			case 4: platform = '아케이드 게임'; break;
-		}
-		let rating;
-		switch(data.rating) {
-			case 1: rating = '전체이용가'; break;
-			case 2: rating = '12세 이용가'; break;
-			case 3: rating = '15세 이용가'; break;
-			case 4: rating = '청소년 이용불가'; break;
-		}
-		let applicant = data.applicant;
-		let aid = data.aid;
+	tweet() {
+		let self = this;
 		
-		let status = `[${date}]\n[${platform}]\n[${name}]\n[${applicant}]\n`;
-		if(rating) {
-			status += `[${rating}]\n`;
-		}
-		let excess = status.length - (140 - 23);
-		if(excess > 0) {
-			var tokens = status.match(/\[.*\]/g);
-			tokens[2] = '[' + name.substr(0, name.length - excess - 1) + '…]';
-			status = tokens.join('\n');
-			status += '\n';
-		}
-		status += `http://www.grac.or.kr/Statistics/Popup/Pop_ReasonInfo.aspx?${aid}`;
-		
-		twit.post('statuses/update', {
-			status: status
-		}, (err, res) => {
-			if(err) {
-				console.log(err);
-			}
+		return new Promise((resolve, reject) => {
+			knex(table_name).where({
+				tweet: 0
+			}).then((rows) => {
+				let promises = rows.map((row) => {
+					return new Promise((resolve, reject) => {
+						let date = row.date;
+						let title = row.title;
+							let platform;
+						switch(row.platform) {
+						case -1: platform = ''; break;
+						case 0: platform = 'PC/온라인 게임'; break;
+						case 1: platform = '비디오 게임'; break;
+						case 2: platform = '모바일 게임'; break;
+						case 3: platform = '아케이드 게임'; break;
+						}
+						let rating;
+						switch(row.rating) {
+						case -1: rating = ''; break;
+						case 0: rating = '전체이용가'; break;
+						case 1: rating = '12세 이용가'; break;
+						case 2: rating = '15세 이용가'; break;
+						case 3: rating = '청소년 이용불가'; break;
+						case 4: rating = '등급거부'; break;
+						case 5: rating = '등급취소예정'; break;
+						case 6: rating = '등급취소'; break;
+						}
+						let applicant = row.applicant;
+						
+						let status = `[${date}]\n[${platform}]\n[${title}]\n[${applicant}]\n[${rating}]\n`;
+						
+						let excess = status.length - (140 - 23);
+						if(excess > 0) {
+							var tokens = status.match(/\[.*\]/g);
+							tokens[2] = '[' + title.substr(0, title.length - excess - 1) + '…]';
+							status = tokens.join('\n');
+							status += '\n';
+						}
+						status += `http://www.grac.or.kr/Statistics/Popup/Pop_ReasonInfo.aspx?${row.id}`;
+						
+						twit.post('statuses/update', {
+							status: status
+						}, (err, res) => {
+							if(err) {
+								throw new Error(err);
+							}
+							
+							knex(table_name).where({
+								id: row.id
+							}).update({
+								tweet: 1
+							}).then(() => {
+								resolve();
+							}).catch((e) => {
+								console.log(e);
+							});
+						});
+					});
+				});
+				Promise.all(promises).then(() => {
+					resolve();
+				}).catch((e) => {
+					console.log(e);
+				});
+			});
 		});
 	}
 }
