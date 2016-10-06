@@ -78,6 +78,7 @@ describe('@gcrb_bot', function() {
 
 	describe('tweet', function() {
 		it('compose tweet', function() {
+			this.timeout(10000);
 			return app.parser.parsePage({
 				startdate: '2016-09-27',
 				enddate: '2016-09-29',
