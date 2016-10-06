@@ -80,7 +80,7 @@ describe('@gcrb_bot', function() {
 		});
 
 		it('get untweeted items', function() {
-			return app.db.getUntweetedItems().should.eventually.have.length(1);
+			return app.db.getUntweetedItems();
 		});
 
 		it('flag tweeted items', function() {
