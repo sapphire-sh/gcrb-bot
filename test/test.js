@@ -48,7 +48,24 @@ describe('@gcrb_bot', function() {
 	});
 
 	describe('db', function() {
+		it('second initialization', function() {
+			return app.db.initialize();
+		});
+
 		it('insert items', function() {
+			this.timeout(10000);
+			return app.parser.parsePage({
+				startdate: '2016-09-27',
+				enddate: '2016-09-29',
+				platform: '03',
+				page: 0
+			})
+			.then((items) => {
+				return app.db.insertItems(items);
+			});
+		});
+
+		it('insert duplicate items', function() {
 			this.timeout(10000);
 			return app.parser.parsePage({
 				startdate: '2016-09-27',
