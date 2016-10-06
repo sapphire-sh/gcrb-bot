@@ -50,6 +50,7 @@ describe('@gcrb_bot', function() {
 
 	describe('db', function() {
 		it('second initialization', function() {
+			this.timeout(50000);
 			return app.db.initialize();
 		});
 
