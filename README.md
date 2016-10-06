@@ -5,4 +5,3 @@
 [![Dependency Status](https://gemnasium.com/badges/github.com/sapphiredev/gcrb_bot.svg)](https://gemnasium.com/github.com/sapphiredev/gcrb_bot)
 
 https://twitter.com/gcrb_bot
-

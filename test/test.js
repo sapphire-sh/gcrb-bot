@@ -49,6 +49,7 @@ describe('@gcrb_bot', function() {
 
 	describe('db', function() {
 		it('insert items', function() {
+			this.timeout(10000);
 			return app.parser.parsePage({
 				startdate: '2016-09-27',
 				enddate: '2016-09-29',

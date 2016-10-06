@@ -6,10 +6,10 @@ let knex = require('knex')(config.knex);
 const table_name = 'gcrb_bot';
 
 class DB {
-  initialize() {
-    let self = this;
+	initialize() {
+		let self = this;
 
-    return knex.schema.hasTable(table_name).then((exists) => {
+		return knex.schema.hasTable(table_name).then((exists) => {
 			if(exists) {
 				return Promise.resolve();
 			}
@@ -27,49 +27,49 @@ class DB {
 				});
 			}
 		});
-  }
+	}
 
-  insertItem(item) {
-    let self = this;
+	insertItem(item) {
+		let self = this;
 
-    return knex(table_name).where({
-      id: item.id
-    }).then((rows) => {
-      if(rows.length === 0) {
-        return knex(table_name).insert(item);
-      }
-      else {
-        return Promise.resolve();
-      }
-    });
-  }
+		return knex(table_name).where({
+			id: item.id
+		}).then((rows) => {
+			if(rows.length === 0) {
+				return knex(table_name).insert(item);
+			}
+			else {
+				return Promise.resolve();
+			}
+		});
+	}
 
-  insertItems(items) {
-    let self = this;
+	insertItems(items) {
+		let self = this;
 
-    let promises = items.map((item) => {
-      return self.insertItem(item);
-    });
-    return Promise.all(promises);
-  }
+		let promises = items.map((item) => {
+			return self.insertItem(item);
+		});
+		return Promise.all(promises);
+	}
 
-  flagTweetedItem(item) {
-    let self = this;
+	flagTweetedItem(item) {
+		let self = this;
 
-    return knex(table_name).where({
-      id: item.id
-    }).update({
-      tweet: 1
-    });
-  }
+		return knex(table_name).where({
+			id: item.id
+		}).update({
+			tweet: 1
+		});
+	}
 
 	getUntweetedItems() {
 		let self = this;
 
-    return knex(table_name).where({
-      tweet: 0
-    });
-  }
+		return knex(table_name).where({
+			tweet: 0
+		});
+	}
 }
 
 module.exports = DB;

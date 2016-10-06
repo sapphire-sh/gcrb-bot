@@ -1,36 +1,36 @@
 {
-  "name": "gcrb_bot",
-  "version": "0.0.1",
-  "description": "@gcrb_bot",
-  "main": "gcrb_bot.js",
-  "scripts": {
-    "start": "pm2 start ./app.json",
-    "stop": "pm2 stop ./app.json",
-    "test": "NODE_ENV=test mocha",
-    "test-coverage": "NODE_ENV=test istanbul cover _mocha",
-    "coveralls": "npm run test-coverage -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sapphiredev/gcrb_bot.git"
-  },
-  "author": "sapphire",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/sapphiredev/gcrb_bot/issues"
-  },
-  "homepage": "https://github.com/sapphiredev/gcrb_bot#readme",
-  "dependencies": {
-    "cheerio": "^0.22.0",
-    "knex": "^0.12.2",
-    "request": "^2.75.0",
-    "sqlite3": "^3.1.5",
-    "twit": "^2.2.5"
-  },
-  "devDependencies": {
-    "coveralls": "^2.11.14",
-    "istanbul": "^0.4.5",
-    "mocha": "^3.1.0",
-    "should": "^11.1.0"
-  }
+	"name": "gcrb_bot",
+	"version": "0.0.1",
+	"description": "@gcrb_bot",
+	"main": "gcrb_bot.js",
+	"scripts": {
+		"start": "pm2 start ./app.json",
+		"stop": "pm2 stop ./app.json",
+		"test": "NODE_ENV=test mocha",
+		"test-coverage": "NODE_ENV=test istanbul cover _mocha",
+		"coveralls": "npm run test-coverage -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/sapphiredev/gcrb_bot.git"
+	},
+	"author": "sapphire",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/sapphiredev/gcrb_bot/issues"
+	},
+	"homepage": "https://github.com/sapphiredev/gcrb_bot#readme",
+	"dependencies": {
+		"cheerio": "^0.22.0",
+		"knex": "^0.12.2",
+		"request": "^2.75.0",
+		"sqlite3": "^3.1.5",
+		"twit": "^2.2.5"
+	},
+	"devDependencies": {
+		"coveralls": "^2.11.14",
+		"istanbul": "^0.4.5",
+		"mocha": "^3.1.0",
+		"should": "^11.1.0"
+	}
 }

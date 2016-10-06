@@ -18,4 +18,3 @@ notifications:
 after_success:
   - rm gcrb_bot.sqlite
   - npm run coveralls
-
