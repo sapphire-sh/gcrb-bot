@@ -28,6 +28,7 @@ class App {
 		return app.initialize()
 		.then(function loop(i) {
 			console.log(i);
+
 			return app.parser.getDates()
 			.then((dates) => {
 				return app.parser.getPlatforms()
@@ -68,13 +69,18 @@ class App {
 				})
 				.then((items) => {
 					let promises = items.map((item) => {
-						return app.tweet.tweetItem(item)
-						.then(() => {
-							return app.db.flagTweetedItem(item);
-						})
-						.catch((e) => {
-							console.log(e);
-						});
+						if(process.env.NODE_ENV === 'test') {
+							return Promise.resolve();
+						}
+						else {
+							return app.tweet.tweetItem(item)
+							.then(() => {
+								return app.db.flagTweetedItem(item);
+							})
+							.catch((e) => {
+								console.log(e);
+							});
+						}
 					});
 					return Promise.all(promises);
 				})
@@ -82,10 +88,17 @@ class App {
 					return new Promise((resolve, reject) => {
 						setTimeout(() => {
 							resolve(i + 1);
-						}, 1000);
+						}, (process.env.NODE_ENV === 'test' ? 0 : 5 * 60 * 1000));
 					});
 				})
-				.then(loop)
+				.then((i) => {
+					if(process.env.NODE_ENV == 'test') {
+						return Promise.resolve(i);
+					}
+					else {
+						return loop(i);
+					}
+				})
 				.catch((e) => {
 					console.log(e);
 				});
@@ -101,8 +114,6 @@ class App {
 }
 
 let app = new App();
-if(process.env.NODE_ENV !== "test") {
-	app.start().then(() => {});
-}
+app.start().then(() => {});
 
 module.exports = App;
