@@ -21,16 +21,16 @@
 	},
 	"homepage": "https://github.com/sapphiredev/gcrb_bot#readme",
 	"dependencies": {
-		"cheerio": "^0.22.0",
-		"knex": "^0.12.2",
-		"request": "^2.75.0",
-		"sqlite3": "^3.1.8",
-		"twit": "^2.2.5"
+		"cheerio": "^1.0.0-rc.2",
+		"knex": "^0.15.2",
+		"request": "^2.88.0",
+		"sqlite3": "^4.0.2",
+		"twit": "^2.2.11"
 	},
 	"devDependencies": {
-		"coveralls": "^2.11.14",
+		"coveralls": "^3.0.2",
 		"istanbul": "^0.4.5",
-		"mocha": "^3.1.0",
-		"should": "^11.1.0"
+		"mocha": "^5.2.0",
+		"should": "^13.2.3"
 	}
 }
