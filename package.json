@@ -1,36 +1,41 @@
 {
-	"name": "gcrb_bot",
-	"version": "0.0.1",
-	"description": "@gcrb_bot",
-	"main": "gcrb_bot.js",
-	"scripts": {
-		"start": "pm2 start ./app.json",
-		"stop": "pm2 stop ./app.json",
-		"test": "NODE_ENV=test mocha",
-		"test-coverage": "NODE_ENV=test istanbul cover _mocha",
-		"coveralls": "npm run test-coverage -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/sapphiredev/gcrb_bot.git"
-	},
-	"author": "sapphire",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/sapphiredev/gcrb_bot/issues"
-	},
-	"homepage": "https://github.com/sapphiredev/gcrb_bot#readme",
-	"dependencies": {
-		"cheerio": "^1.0.0-rc.2",
-		"knex": "^0.15.2",
-		"request": "^2.88.0",
-		"sqlite3": "^4.0.2",
-		"twit": "^2.2.11"
-	},
-	"devDependencies": {
-		"coveralls": "^3.0.2",
-		"istanbul": "^0.4.5",
-		"mocha": "^5.2.0",
-		"should": "^13.2.3"
-	}
+  "name": "gcrb_bot",
+  "version": "0.0.1",
+  "description": "@gcrb_bot",
+  "main": "gcrb_bot.js",
+  "scripts": {
+    "build": "webpack",
+    "prestart": "npm run build",
+    "start": "pm2 start ./app.json",
+    "stop": "pm2 stop ./app.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sapphiredev/gcrb_bot.git"
+  },
+  "author": "sapphire",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sapphiredev/gcrb_bot/issues"
+  },
+  "homepage": "https://github.com/sapphiredev/gcrb_bot#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "knex": "^0.15.2",
+    "request": "^2.88.0",
+    "sqlite3": "^4.0.2",
+    "twit": "^2.2.11"
+  },
+  "devDependencies": {
+    "@types/cheerio": "^0.22.9",
+    "@types/knex": "^0.14.23",
+    "@types/request": "^2.47.1",
+    "@types/twit": "^2.2.19",
+    "ts-loader": "^5.0.0",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.3",
+    "webpack": "^4.17.2",
+    "webpack-command": "^0.4.1",
+    "webpack-node-externals": "^1.7.2"
+  }
 }

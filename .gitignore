@@ -29,3 +29,5 @@ node_modules
 config.js
 *.sqlite
 .coveralls.yml
+/dist
+

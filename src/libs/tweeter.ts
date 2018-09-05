@@ -1,21 +1,23 @@
-'use strict';
+import Twit from 'twit';
 
-const config = require('../../config');
-let twit = new (require('twit'))(config.twitter);
+export class Tweeter {
+	private twit: Twit[];
 
-class Tweet {
-	initialize() {
-		let self = this;
-
+	public initialize(config: any) {
+		this.twit = [
+			new Twit(config.twitter0),
+			new Twit(config.twitter1),
+			new Twit(config.twitter2),
+			new Twit(config.twitter3),
+			new Twit(config.twitter4),
+		];
 		return Promise.resolve();
 	}
 
-	composeTweet(item) {
-		let self = this;
-
+	public composeTweet(item) {
 		return new Promise((resolve, reject) => {
-			let date = item.date;
-			let title = item.title;
+			const date = item.date;
+			const title = item.title;
 			let platform;
 			switch(item.platform) {
 				case -1: platform = ''; break;
@@ -35,36 +37,36 @@ class Tweet {
 				case 5: rating = '등급취소예정'; break;
 				case 6: rating = '등급취소'; break;
 			}
-			let applicant = item.applicant;
+			const applicant = item.applicant;
 
 			let status = `[${date}]\n[${platform}]\n[${title}]\n[${applicant}]\n[${rating}]\n`;
 
-			let excess = status.length - (140 - 23);
+			const excess = status.length - (140 - 23);
 			if(excess > 0) {
-				var tokens = status.match(/\[.*\]/g);
+				const tokens = status.match(/\[.*\]/g);
 				tokens[2] = '[' + title.substr(0, title.length - excess - 1) + '…]';
 				status = tokens.join('\n');
 				status += '\n';
 			}
-			status += `http://www.grac.or.kr/Statistics/Popup/Pop_ReasonInfo.aspx?${item.id}`;
+			status += `http://www.grac.or.kr/Statistics/Popup/Pop_ReasonInfo.aspx?${item.id}\n@GameRatingInfo`;
 
 			resolve({
-				status: status
+				'status': status,
 			});
 		});
 	}
 
-	tweetItem(item) {
-		let self = this;
-
-		return self.composeTweet(item)
-		.then((data) => {
+	public tweetItem(item) {
+		return this.composeTweet(item)
+		.then((data: any) => {
 			return new Promise((resolve, reject) => {
-				twit.post('statuses/update', {
-					status: data.status
+				this.twit[item.platform + 1].post('statuses/update', {
+					'status': data.status,
 				}, (err, res) => {
 					if(err) {
-						throw new Error(err);
+						console.log(err);
+						reject(err);
+						return;
 					}
 					resolve();
 				});
@@ -75,5 +77,3 @@ class Tweet {
 		});
 	}
 }
-
-module.exports = Tweet;
