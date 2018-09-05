@@ -4,7 +4,9 @@
   "description": "@gcrb_bot",
   "main": "gcrb_bot.js",
   "scripts": {
-    "build": "webpack",
+	"clean": "rm -rf ./dist",
+	"prebuild": "npm run clean",
+	"build": "webpack",
     "prestart": "npm run build",
     "start": "pm2 start ./app.json",
     "stop": "pm2 stop ./app.json"
