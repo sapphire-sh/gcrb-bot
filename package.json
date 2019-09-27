@@ -8,8 +8,8 @@
     "prebuild": "npm run clean",
     "build": "webpack",
     "prestart": "npm run build",
-    "start": "pm2 start ./app.json",
-    "stop": "pm2 stop ./app.json"
+    "start": "node ./dist/main.js",
+    "test": "jest --coverage"
   },
   "repository": {
     "type": "git",
@@ -30,9 +30,12 @@
   "devDependencies": {
     "@types/cheerio": "^0.22.13",
     "@types/ioredis": "^4.0.18",
+    "@types/jest": "^24.0.18",
     "@types/request": "^2.48.3",
     "@types/twit": "^2.2.22",
     "ioredis-mock": "^4.16.3",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
     "ts-loader": "^6.1.2",
     "tslint": "^5.20.0",
     "typescript": "^3.6.3",

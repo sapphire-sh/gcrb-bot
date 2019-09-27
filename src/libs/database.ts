@@ -5,7 +5,7 @@ import {
 } from '../models';
 
 import {
-	equal,
+	equals,
 } from '../helpers';
 
 export class Database {
@@ -39,7 +39,7 @@ export class Database {
 		const id = nextItem.id;
 
 		const prevItem = await this.getItem(id);
-		if (prevItem === null || equal(prevItem, nextItem)) {
+		if (prevItem === null || equals(prevItem, nextItem)) {
 			return true;
 		}
 

@@ -7,7 +7,7 @@ sudo: false
 
 script:
   - cp config.sample.js config.js
-  - npm test
+  - npm run test
 
 notifications:
   email: false
