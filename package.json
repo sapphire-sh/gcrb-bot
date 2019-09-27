@@ -24,7 +24,8 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
     "ioredis": "^4.14.1",
-    "request": "^2.88.0",
+    "qs": "^6.9.0",
+    "request-promise": "^4.2.4",
     "twit": "^2.2.11"
   },
   "devDependencies": {
@@ -33,7 +34,8 @@
     "@types/ioredis": "^4.0.18",
     "@types/ioredis-mock": "github:5minlab/types-ioredis-mock",
     "@types/jest": "^24.0.18",
-    "@types/request": "^2.48.3",
+    "@types/qs": "^6.5.3",
+    "@types/request-promise": "^4.1.44",
     "@types/twit": "^2.2.22",
     "codecov": "^3.6.1",
     "faker": "^4.1.0",
