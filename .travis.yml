@@ -13,5 +13,4 @@ notifications:
   email: false
 
 after_success:
-  - rm gcrb_bot.sqlite
-  - npm run coveralls
+  - npx codecov
