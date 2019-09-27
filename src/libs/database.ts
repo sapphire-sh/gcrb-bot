@@ -46,8 +46,8 @@ export class Database {
 		const id = nextItem.id;
 
 		const prevItem = await this.getItem(id);
-		if (prevItem === null || equals(prevItem, nextItem)) {
-			return true;
+		if (prevItem !== null && equals(prevItem, nextItem)) {
+			return false;
 		}
 
 		{
@@ -58,17 +58,18 @@ export class Database {
 				return false;
 			}
 		}
-		{
+		try {
 			const key = this.key('index');
 			if (nextItem.tweet === 0) {
-				const res = await this.redis.sadd(key, id);
-				console.log('sadd', res);
+				await this.redis.sadd(key, id);
 			}
 			else {
-				const res = await this.redis.srem(key, id);
-				console.log('srem', res);
+				await this.redis.srem(key, id);
 			}
 			return true;
+		}
+		catch {
+			return false;
 		}
 	}
 
