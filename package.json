@@ -4,9 +4,9 @@
   "description": "@gcrb_bot",
   "main": "gcrb_bot.js",
   "scripts": {
-	"clean": "rm -rf ./dist",
-	"prebuild": "npm run clean",
-	"build": "webpack",
+    "clean": "rm -rf ./dist",
+    "prebuild": "npm run clean",
+    "build": "webpack",
     "prestart": "npm run build",
     "start": "pm2 start ./app.json",
     "stop": "pm2 stop ./app.json"
@@ -23,21 +23,21 @@
   "homepage": "https://github.com/sapphiredev/gcrb_bot#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
-    "knex": "^0.15.2",
+    "knex": "^0.19.4",
     "request": "^2.88.0",
-    "sqlite3": "^4.0.2",
+    "sqlite3": "^4.1.0",
     "twit": "^2.2.11"
   },
   "devDependencies": {
-    "@types/cheerio": "^0.22.9",
-    "@types/knex": "^0.14.23",
-    "@types/request": "^2.47.1",
-    "@types/twit": "^2.2.19",
-    "ts-loader": "^5.0.0",
-    "tslint": "^5.11.0",
-    "typescript": "^3.0.3",
-    "webpack": "^4.17.2",
-    "webpack-command": "^0.4.1",
+    "@types/cheerio": "^0.22.13",
+    "@types/knex": "^0.16.1",
+    "@types/request": "^2.48.3",
+    "@types/twit": "^2.2.22",
+    "ts-loader": "^6.1.2",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.3",
+    "webpack": "^4.41.0",
+    "webpack-command": "^0.5.0",
     "webpack-node-externals": "^1.7.2"
   }
 }
