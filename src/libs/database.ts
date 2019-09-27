@@ -5,18 +5,18 @@ import {
 } from '../models';
 
 export class Database {
-	private knex: Knex;
+	private knex: Knex | null = null;
 	private tableName = 'gcrb_bot';
 
 	public async initialize(config: any): Promise<void> {
 		this.knex = Knex(config.knex);
 
 		const exists = await this.knex.schema.hasTable(this.tableName);
-		if(exists) {
+		if (exists) {
 			return;
 		}
 
-		await this.knex.schema.createTable(this.tableName, (table) => {
+		await this.knex.schema.createTable(this.tableName, table => {
 			table.string('id').primary().notNullable();
 			table.string('date').notNullable();
 			table.string('title').notNullable();
@@ -25,27 +25,27 @@ export class Database {
 			table.integer('rating').notNullable();
 			table.string('code');
 			table.integer('tweet').notNullable();
-			table.timestamp('created_at').defaultTo(this.knex.fn.now());
+			table.timestamp('created_at').defaultTo(this.knex!.fn.now());
 		});
 	}
 
-	private async insertItem(item): Promise<void> {
-		const rows = await this.knex(this.tableName).where({
+	private async insertItem(item: any): Promise<void> {
+		const rows = await this.knex!(this.tableName).where({
 			'id': item.id,
 		});
-		if(rows.length === 0) {
-			await this.knex(this.tableName).insert(item);
+		if (rows.length === 0) {
+			await this.knex!(this.tableName).insert(item);
 		}
 	}
 
-	public async insertItems(items): Promise<void> {
-		for(const item of items) {
+	public async insertItems(items: any[]): Promise<void> {
+		for (const item of items) {
 			await this.insertItem(item);
 		}
 	}
 
-	public async flagTweetedItem(item): Promise<void> {
-		await this.knex(this.tableName).where({
+	public async flagTweetedItem(item: any): Promise<void> {
+		await this.knex!(this.tableName).where({
 			'id': item.id,
 		}).update({
 			'tweet': 1,
@@ -53,7 +53,7 @@ export class Database {
 	}
 
 	public async getUntweetedItems(platform: number): Promise<Item[]> {
-		return await this.knex(this.tableName).where({
+		return await this.knex!(this.tableName).where({
 			'tweet': 0,
 			'platform': platform,
 		});

@@ -9,7 +9,7 @@ import {
 		await app.initialize();
 		app.start();
 	}
-	catch(err) {
+	catch (err) {
 		console.log(err);
 	}
 })();

@@ -1,7 +1,7 @@
 {
   "name": "gcrb_bot",
   "version": "0.0.1",
-  "description": "@gcrb_bot",
+  "description": "https://twitter.com/GameRatingInfo",
   "main": "gcrb_bot.js",
   "scripts": {
     "clean": "rm -rf ./dist",

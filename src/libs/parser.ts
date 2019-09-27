@@ -41,8 +41,8 @@ export class Parser {
 		return this.platforms;
 	}
 
-	public getURL(data) {
-		const params = {
+	public getURL(data: any) {
+		const params: any = {
 			'type': 'search',
 			'enddate': data.enddate,
 			'startdate': data.startdate,
@@ -50,7 +50,7 @@ export class Parser {
 			'pageindex': data.page,
 		};
 
-		return `${this.baseURL}?${Object.keys(params).map((e) => {
+		return `${this.baseURL}?${Object.keys(params).map(e => {
 			return `${e}=${params[e]}`;
 		}).join('&')}`;
 	}
@@ -64,7 +64,7 @@ export class Parser {
 				},
 			}, (err, res, body: string) => {
 				console.log(typeof body);
-				if(err || res.statusCode !== 200) {
+				if (err || res.statusCode !== 200) {
 					reject(err);
 				}
 				resolve(body);
@@ -72,7 +72,7 @@ export class Parser {
 		});
 	}
 
-	private parseItem($, e, platform: number): Item {
+	private parseItem($: any, e: any, platform: number): Item | null {
 		try {
 			const column = $(e).find('td').toArray();
 
@@ -96,7 +96,7 @@ export class Parser {
 				'tweet': tweet,
 			};
 		}
-		catch(err) {
+		catch (err) {
 			/* istanbul ignore next */
 			console.log(err);
 			/* istanbul ignore next */
@@ -104,7 +104,7 @@ export class Parser {
 		}
 	}
 
-	public async parsePage(data): Promise<Item[]> {
+	public async parsePage(data: any): Promise<Item[]> {
 		const url = this.getURL(data);
 
 		console.log(url);
@@ -116,12 +116,12 @@ export class Parser {
 
 		const items: Item[] = [];
 		$('table.statistics tr').each((i, e) => {
-			if(i === 0) {
+			if (i === 0) {
 				return;
 			}
 
 			const item = this.parseItem($, e, platform);
-			if(item === null) {
+			if (item === null) {
 				return;
 			}
 			items.push(item);
