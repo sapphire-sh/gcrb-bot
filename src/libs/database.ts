@@ -1,5 +1,7 @@
 import IORedis from 'ioredis';
 
+import IORedisMock from 'ioredis-mock';
+
 import {
 	Item,
 } from '~/models';
@@ -12,7 +14,12 @@ export class Database {
 	private readonly redis: IORedis.Redis;
 
 	public constructor() {
-		this.redis = new IORedis();
+		if (__test) {
+			this.redis = new IORedisMock();
+		}
+		else {
+			this.redis = new IORedis();
+		}
 	}
 
 	public key(id: string) {

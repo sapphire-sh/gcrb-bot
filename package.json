@@ -30,6 +30,7 @@
   "devDependencies": {
     "@types/cheerio": "^0.22.13",
     "@types/ioredis": "^4.0.18",
+    "@types/ioredis-mock": "github:5minlab/types-ioredis-mock",
     "@types/jest": "^24.0.18",
     "@types/request": "^2.48.3",
     "@types/twit": "^2.2.22",
