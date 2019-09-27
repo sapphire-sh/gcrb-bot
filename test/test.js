@@ -6,6 +6,10 @@
 // var App = require('../src/app');
 // var app = new App();
 
+describe('', () => {
+	test('', () => { });
+})
+
 // describe('@gcrb_bot', function() {
 // 	it('initialize app', function(done) {
 // 		app.initialize()

@@ -2,11 +2,11 @@ import IORedis from 'ioredis';
 
 import {
 	Item,
-} from '../models';
+} from '~/models';
 
 import {
 	equals,
-} from '../helpers';
+} from '~/helpers';
 
 export class Database {
 	private readonly redis: IORedis.Redis;

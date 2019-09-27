@@ -45,6 +45,9 @@ module.exports = {
 			'.js',
 			'.json',
 		],
+		'alias': {
+			'~': srcPath,
+		},
 	},
 	'mode': process.env.NODE_ENV === 'dev' ? 'development' : 'production',
 };

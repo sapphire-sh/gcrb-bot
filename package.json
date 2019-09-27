@@ -4,7 +4,7 @@
   "description": "https://twitter.com/GameRatingInfo",
   "main": "gcrb_bot.js",
   "scripts": {
-    "clean": "rm -rf ./dist",
+    "clean": "rm -fr ./dist",
     "prebuild": "npm run clean",
     "build": "webpack",
     "prestart": "npm run build",

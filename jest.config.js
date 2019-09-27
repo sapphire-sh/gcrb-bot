@@ -6,8 +6,11 @@ module.exports = {
 			"isolatedModules": true,
 		},
 	},
-	rootDir: "./src",
+    moduleNameMapper: {
+      "~/(.*)": "<rootDir>/src/$1"
+    },
+	rootDir: ".",
 	collectCoverageFrom: [
-		"**/*.{js,ts}"
+		"src/**/*.{js,ts}"
 	],
 };

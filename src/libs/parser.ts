@@ -3,7 +3,7 @@ import cheerio from 'cheerio';
 
 import {
 	Item,
-} from '../models';
+} from '~/models';
 
 export class Parser {
 	private baseURL = 'http://www.grac.or.kr/Statistics/GameStatistics.aspx';

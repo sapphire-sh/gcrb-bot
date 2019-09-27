@@ -1,6 +1,6 @@
 import {
 	equals,
-} from '../../helpers';
+} from '~/helpers';
 
 describe('helpers/equals', () => {
 	test('success', () => {
