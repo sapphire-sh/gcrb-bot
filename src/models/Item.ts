@@ -2,7 +2,7 @@ export interface Item {
 	id: string;
 	date: string;
 	title: string;
-	platform: number;
+	platform: string;
 	applicant: string;
 	rating: number;
 	code: string;

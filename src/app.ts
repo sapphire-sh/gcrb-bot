@@ -1,10 +1,17 @@
-'use strict';
+import {
+	PLATFORMS,
+} from '~/constants';
 
 import {
 	Database,
 	Parser,
 	Tweeter,
-} from './libs';
+} from '~/libs';
+
+import {
+	getURL,
+	sendRequest,
+} from '~/helpers';
 
 export class App {
 	public database: Database | null = null;
@@ -23,24 +30,20 @@ export class App {
 	}
 
 	private async parse(platform: string, startdate: string, enddate: string): Promise<void> {
-		const data = {
-			'platform': platform,
-			'startdate': startdate,
-			'enddate': enddate,
-			'page': 0,
-		};
-
+		let page = 0;
 		let items = [];
 		do {
-			items = await this.parser!.parsePage(data);
+			const url = getURL({ type: 'search', pageindex: page, enddate, startdate, platform });
+			const body = await sendRequest(url);
+			items = await this.parser!.parsePage(body, platform);
 			const promises = items.map(x => this.database!.insertItem(x));
 			await Promise.all(promises);
-			++data.page;
+			++page;
 		}
 		while (items.length > 0);
 	}
 
-	private async tweet(platform: number) {
+	private async tweet(platform: string) {
 		const items = await this.database!.getUntweetedItems(platform);
 		for (const item of items) {
 			if (__test === false) {
@@ -62,16 +65,12 @@ export class App {
 			const {
 				startdate,
 				enddate,
-			} = this.parser!.getDates();
-			const platforms = this.parser!.getPlatforms();
+			} = this.parser!.dates;
 
-			await Promise.all(platforms.map(e => {
-				return this.parse(e, startdate, enddate);
-			}));
-
-			await Promise.all(platforms.map((_, i) => {
-				return this.tweet(i);
-			}));
+			for (const platform of PLATFORMS) {
+				await this.parse(platform, startdate, enddate);
+				await this.tweet(platform);
+			}
 		}
 	}
 
