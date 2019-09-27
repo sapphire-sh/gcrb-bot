@@ -23,16 +23,16 @@
   "homepage": "https://github.com/sapphiredev/gcrb_bot#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
-    "knex": "^0.19.4",
+    "ioredis": "^4.14.1",
     "request": "^2.88.0",
-    "sqlite3": "^4.1.0",
     "twit": "^2.2.11"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.13",
-    "@types/knex": "^0.16.1",
+    "@types/ioredis": "^4.0.18",
     "@types/request": "^2.48.3",
     "@types/twit": "^2.2.22",
+    "ioredis-mock": "^4.16.3",
     "ts-loader": "^6.1.2",
     "tslint": "^5.20.0",
     "typescript": "^3.6.3",

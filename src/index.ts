@@ -5,9 +5,8 @@ import {
 (async () => {
 	try {
 		const app = new App();
-
 		await app.initialize();
-		app.start();
+		await app.start();
 	}
 	catch (err) {
 		console.log(err);

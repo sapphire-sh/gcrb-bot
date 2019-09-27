@@ -1,61 +1,75 @@
-import Knex from 'knex';
+import IORedis from 'ioredis';
 
 import {
 	Item,
 } from '../models';
 
+import {
+	equal,
+} from '../helpers';
+
 export class Database {
-	private knex: Knex | null = null;
-	private tableName = 'gcrb_bot';
+	private readonly redis: IORedis.Redis;
 
-	public async initialize(config: any): Promise<void> {
-		this.knex = Knex(config.knex);
-
-		const exists = await this.knex.schema.hasTable(this.tableName);
-		if (exists) {
-			return;
-		}
-
-		await this.knex.schema.createTable(this.tableName, table => {
-			table.string('id').primary().notNullable();
-			table.string('date').notNullable();
-			table.string('title').notNullable();
-			table.integer('platform').notNullable();
-			table.string('applicant').notNullable();
-			table.integer('rating').notNullable();
-			table.string('code');
-			table.integer('tweet').notNullable();
-			table.timestamp('created_at').defaultTo(this.knex!.fn.now());
-		});
+	public constructor() {
+		this.redis = new IORedis();
 	}
 
-	private async insertItem(item: any): Promise<void> {
-		const rows = await this.knex!(this.tableName).where({
-			'id': item.id,
-		});
-		if (rows.length === 0) {
-			await this.knex!(this.tableName).insert(item);
+	public key(id: string) {
+		return `gcrb_bot:${id}`;
+	}
+
+	public async getItem(id: string): Promise<Item | null> {
+		const key = this.key(id);
+		const res = await this.redis.get(key);
+
+		if (res === null) {
+			return null;
+		}
+		try {
+			const item = JSON.parse(res);
+			return item;
+		}
+		catch {
+			return null;
 		}
 	}
 
-	public async insertItems(items: any[]): Promise<void> {
-		for (const item of items) {
-			await this.insertItem(item);
-		}
-	}
+	public async insertItem(nextItem: Item): Promise<boolean> {
+		const id = nextItem.id;
 
-	public async flagTweetedItem(item: any): Promise<void> {
-		await this.knex!(this.tableName).where({
-			'id': item.id,
-		}).update({
-			'tweet': 1,
-		});
+		const prevItem = await this.getItem(id);
+		if (prevItem === null || equal(prevItem, nextItem)) {
+			return true;
+		}
+
+		{
+			const key = this.key(id);
+			const value = JSON.stringify(nextItem);
+			const res = await this.redis.set(key, value, 'EX', 7 * 24 * 3600);
+			if (res !== 'OK') {
+				return false;
+			}
+		}
+		{
+			const key = this.key('index');
+			if (nextItem.tweet === 0) {
+				const res = await this.redis.sadd(key, id);
+				console.log('sadd', res);
+			}
+			else {
+				const res = await this.redis.srem(key, id);
+				console.log('srem', res);
+			}
+			return true;
+		}
 	}
 
 	public async getUntweetedItems(platform: number): Promise<Item[]> {
-		return await this.knex!(this.tableName).where({
-			'tweet': 0,
-			'platform': platform,
-		});
+		const key = this.key('index');
+		const ids: string[] = await this.redis.smembers(key);
+		const promises = ids.map(id => this.getItem(id));
+		const items = await Promise.all(promises);
+		return items.filter((x): x is Item => x !== null).filter(x => x.platform === platform);
 	}
 }

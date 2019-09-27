@@ -17,7 +17,6 @@ export class App {
 		this.parser = new Parser();
 		this.tweeter = new Tweeter();
 
-		await this.database.initialize(__config);
 		this.tweeter.initialize(__config);
 
 		this.shouldProcess = true;
@@ -34,7 +33,8 @@ export class App {
 		let items = [];
 		do {
 			items = await this.parser!.parsePage(data);
-			await this.database!.insertItems(items);
+			const promises = items.map(x => this.database!.insertItem(x));
+			await Promise.all(promises);
 			++data.page;
 		}
 		while (items.length > 0);
@@ -49,7 +49,8 @@ export class App {
 				});
 				await this.tweeter!.tweetItem(item);
 			}
-			await this.database!.flagTweetedItem(item);
+			item.tweet = 1;
+			await this.database!.insertItem(item);
 		}
 		await new Promise(resolve => {
 			setTimeout(resolve, (__test ? 0 : 5 * 60 * 1000));
@@ -61,8 +62,8 @@ export class App {
 			const {
 				startdate,
 				enddate,
-			} = await this.parser!.getDates();
-			const platforms = await this.parser!.getPlatforms();
+			} = this.parser!.getDates();
+			const platforms = this.parser!.getPlatforms();
 
 			await Promise.all(platforms.map(e => {
 				return this.parse(e, startdate, enddate);

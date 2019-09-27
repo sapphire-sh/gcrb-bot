@@ -72,6 +72,7 @@ export class Tweeter {
 	}
 
 	public async tweetItem(item: any): Promise<void> {
+		return;
 		await new Promise((resolve, reject) => {
 			this.twit[item.platform + 1].post('statuses/update', {
 				'status': this.composeTweet(item),
