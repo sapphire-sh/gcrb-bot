@@ -73,7 +73,7 @@ export class Database {
 		}
 	}
 
-	public async getUntweetedItems(platform: number): Promise<Item[]> {
+	public async getUntweetedItems(platform: string): Promise<Item[]> {
 		const key = this.key('index');
 		const ids: string[] = await this.redis.smembers(key);
 		const promises = ids.map(id => this.getItem(id));

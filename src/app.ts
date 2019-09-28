@@ -1,4 +1,5 @@
 import {
+	DATE_RANGE,
 	PLATFORMS,
 } from '~/constants';
 
@@ -9,6 +10,7 @@ import {
 } from '~/libs';
 
 import {
+	getDateString,
 	getURL,
 	sendRequest,
 } from '~/helpers';
@@ -62,10 +64,9 @@ export class App {
 
 	public async start() {
 		while (this.shouldProcess) {
-			const {
-				startdate,
-				enddate,
-			} = this.parser!.dates;
+			const date = new Date();
+			const startdate = getDateString(date, -DATE_RANGE);
+			const enddate = getDateString(date);
 
 			for (const platform of PLATFORMS) {
 				await this.parse(platform, startdate, enddate);
