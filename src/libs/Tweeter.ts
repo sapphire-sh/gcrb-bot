@@ -26,7 +26,7 @@ export class Tweeter {
 
 	protected getTwit(platform: PlatformType): Twit {
 		const index = this.getPlatformIndex(platform);
-		return this.twit[index];
+		return this.twit[index + 1];
 	}
 
 	protected async tweet(platform: PlatformType, status: string): Promise<void> {
