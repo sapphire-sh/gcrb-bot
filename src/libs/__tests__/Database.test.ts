@@ -36,16 +36,11 @@ describe('libs/Database', () => {
 		tweet: 0,
 	};
 
-	let database: Database;
+	const database = new Database();
 
 	beforeEach(async () => {
-		database = new Database();
+		await database.flush();
 		await database.insertItem(prevItem);
-	});
-
-	test('key', () => {
-		const key = database.key(id);
-		expect(key).toBe(`gcrb_bot:${id}`);
 	});
 
 	describe('getItem', () => {

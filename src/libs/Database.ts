@@ -22,24 +22,42 @@ export class Database {
 		}
 	}
 
-	public key(id: string) {
-		return `gcrb_bot:${id}`;
+	public get key() {
+		return `gcrb_bot`;
 	}
 
-	public async getItem(id: string): Promise<Item | null> {
-		const key = this.key(id);
-		const res = await this.redis.get(key);
+	public async flush() {
+		await this.redis.flushall();
+	}
 
-		if (res === null) {
-			return null;
-		}
+	public serializeItem(item: Item): string {
+		return JSON.stringify(item);
+	}
+
+	public deserializeItem(value: string): Item | null {
 		try {
-			const item = JSON.parse(res);
+			const item = JSON.parse(value);
 			return item;
 		}
 		catch {
 			return null;
 		}
+	}
+
+	public async getItem(id: string): Promise<Item | null> {
+		const res = await this.redis.hget(this.key, id);
+
+		if (res === null) {
+			return null;
+		}
+		return this.deserializeItem(res);
+	}
+
+	public async getItems(): Promise<Item[]> {
+		const res: { [key: string]: string; } = await this.redis.hgetall(this.key);
+
+		const items = Object.values(res).map(x => this.deserializeItem(x));
+		return items.filter((x): x is Item => x !== null);
 	}
 
 	public async insertItem(nextItem: Item): Promise<boolean> {
@@ -50,34 +68,14 @@ export class Database {
 			return false;
 		}
 
-		{
-			const key = this.key(id);
-			const value = JSON.stringify(nextItem);
-			const res = await this.redis.set(key, value, 'EX', 7 * 24 * 3600);
-			if (res !== 'OK') {
-				return false;
-			}
-		}
-		try {
-			const key = this.key('index');
-			if (nextItem.tweet === 0) {
-				await this.redis.sadd(key, id);
-			}
-			else {
-				await this.redis.srem(key, id);
-			}
-			return true;
-		}
-		catch {
-			return false;
-		}
+		const value = this.serializeItem(nextItem);
+		await this.redis.hset(this.key, nextItem.id, value);
+
+		return true;
 	}
 
 	public async getUntweetedItems(platform: string): Promise<Item[]> {
-		const key = this.key('index');
-		const ids: string[] = await this.redis.smembers(key);
-		const promises = ids.map(id => this.getItem(id));
-		const items = await Promise.all(promises);
-		return items.filter((x): x is Item => x !== null).filter(x => x.platform === platform);
+		const items = await this.getItems();
+		return items.filter((x): x is Item => x !== null).filter(x => x.platform === platform).filter(x => x.tweet === 0);
 	}
 }
