@@ -32,6 +32,10 @@ describe('libs/Server', () => {
 
 	const server = new TestServer();
 
+	afterAll(() => {
+		server.close();
+	});
+
 	test('/', async () => {
 		const { body } = await request(server.app).get('/').expect(200);
 

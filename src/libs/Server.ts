@@ -35,4 +35,8 @@ export class Server {
 	protected async getItems(): Promise<Item[]> {
 		return await this.database.getItems();
 	}
+
+	public close() {
+		this.server.close();
+	}
 }
