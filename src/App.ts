@@ -14,6 +14,7 @@ import {
 	getDateString,
 	getURL,
 	sendRequest,
+	sleep,
 } from '~/helpers';
 
 export class App {
@@ -38,8 +39,8 @@ export class App {
 		do {
 			const url = getURL({ type: 'search', pageindex: page, enddate, startdate, platform });
 			const body = await sendRequest(url);
-			items = await this.parser!.parsePage(body, platform);
-			const promises = items.map(x => this.database!.insertItem(x));
+			items = await this.parser.parsePage(body, platform);
+			const promises = items.map(x => this.database.insertItem(x));
 			await Promise.all(promises);
 			++page;
 		}
@@ -47,20 +48,16 @@ export class App {
 	}
 
 	private async tweet(platform: string) {
-		const items = await this.database!.getUntweetedItems(platform);
+		const items = await this.database.getUntweetedItems(platform);
 		for (const item of items) {
 			if (__test === false) {
-				await new Promise(resolve => {
-					setTimeout(resolve, 5000);
-				});
-				await this.tweeter!.tweetItem(item);
+				await sleep(5000);
+				await this.tweeter.tweetItem(item);
 			}
 			item.tweet = 1;
-			await this.database!.insertItem(item);
+			await this.database.insertItem(item);
 		}
-		await new Promise(resolve => {
-			setTimeout(resolve, (__test ? 0 : 5 * 60 * 1000));
-		});
+		await sleep(__test ? 0 : 5 * 60 * 1000);
 	}
 
 	public async start() {

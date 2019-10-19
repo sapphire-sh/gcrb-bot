@@ -4,3 +4,4 @@ export * from './equals';
 export * from './getDateString';
 export * from './getURL';
 export * from './sendRequest';
+export * from './sleep';

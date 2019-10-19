@@ -18,7 +18,7 @@ export class Database {
 			this.redis = new IORedisMock();
 		}
 		else {
-			this.redis = new IORedis();
+			this.redis = new IORedis(process.env.REDIS_HOST);
 		}
 	}
 
