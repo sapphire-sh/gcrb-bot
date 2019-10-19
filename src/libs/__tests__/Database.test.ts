@@ -10,6 +10,7 @@ import {
 
 import {
 	copy,
+	getDateString,
 } from '~/helpers';
 
 import {
@@ -23,18 +24,21 @@ describe('libs/Database', () => {
 		return types[idx];
 	}
 
-	const id = faker.random.uuid();
+	function getRandomItem(): Item {
+		return {
+			id: faker.random.uuid(),
+			date: getDateString(faker.date.recent()),
+			title: faker.random.uuid(),
+			platform,
+			applicant: faker.random.uuid(),
+			rating: faker.random.number(),
+			code: faker.random.uuid(),
+			tweet: 0,
+		};
+	}
+
 	const platform = getRandomPlatform();
-	const prevItem: Item = {
-		id,
-		date: faker.date.recent().toString(),
-		title: faker.random.uuid(),
-		platform,
-		applicant: faker.random.uuid(),
-		rating: faker.random.number(),
-		code: faker.random.uuid(),
-		tweet: 0,
-	};
+	const prevItem = getRandomItem();
 
 	const database = new Database();
 
@@ -45,7 +49,7 @@ describe('libs/Database', () => {
 
 	describe('getItem', () => {
 		test('success', async () => {
-			const item = await database.getItem(id);
+			const item = await database.getItem(prevItem.id);
 			expect(item).not.toBeNull();
 		});
 
@@ -58,16 +62,8 @@ describe('libs/Database', () => {
 
 	describe('insertItem', () => {
 		test('success', async () => {
-			const item: Item = {
-				id: faker.random.uuid(),
-				date: faker.date.recent().toString(),
-				title: faker.random.uuid(),
-				platform: getRandomPlatform(),
-				applicant: faker.random.uuid(),
-				rating: faker.random.number(),
-				code: faker.random.uuid(),
-				tweet: 0,
-			};
+			const item = getRandomItem();
+
 			const res = await database.insertItem(item);
 			expect(res).toBe(true);
 
@@ -75,24 +71,46 @@ describe('libs/Database', () => {
 			expect(nextItem).toEqual(item);
 		});
 
-		test('success - update', async () => {
-			const item = copy(prevItem);
-			item.tweet = 1;
-
-			const res = await database.insertItem(item);
-			expect(res).toBe(true);
-
-			const nextItem = await database.getItem(id);
-			expect(nextItem).not.toBeNull();
-			expect(nextItem!.tweet).toBe(1);
-			expect(prevItem.tweet).toBe(0);
-		});
-
 		test('failure - duplicate', async () => {
 			const item = copy(prevItem);
 
 			const res = await database.insertItem(item);
 			expect(res).toBe(false);
+
+			const nextItem = await database.getItem(item.id);
+			expect(nextItem).toEqual(prevItem);
+		});
+	});
+
+	describe('updateItem', () => {
+		test('success', async () => {
+			const item = copy(prevItem);
+			item.tweet = 1;
+
+			const res = await database.updateItem(item);
+			expect(res).toBe(true);
+
+			const nextItem = await database.getItem(prevItem.id);
+			expect(nextItem).not.toBeNull();
+			expect(nextItem!.tweet).toBe(1);
+		});
+
+		test('failure', async () => {
+			const item = copy(prevItem);
+			item.tweet = 1;
+
+			{
+				const res = await database.updateItem(item);
+				expect(res).toBe(true);
+			}
+
+			item.tweet = 0;
+			const res = await database.updateItem(item);
+			expect(res).toBe(false);
+
+			const nextItem = await database.getItem(prevItem.id);
+			expect(nextItem).not.toBeNull();
+			expect(nextItem!.tweet).toBe(1);
 		});
 	});
 
@@ -107,7 +125,7 @@ describe('libs/Database', () => {
 			const item = copy(prevItem);
 			item.tweet = 1;
 
-			const res = await database.insertItem(item);
+			const res = await database.updateItem(item);
 			expect(res).toBe(true);
 
 			const items = await database.getUntweetedItems(platform);

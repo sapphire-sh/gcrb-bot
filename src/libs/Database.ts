@@ -64,7 +64,27 @@ export class Database {
 		const id = nextItem.id;
 
 		const prevItem = await this.getItem(id);
-		if (prevItem !== null && equals(prevItem, nextItem)) {
+		if (prevItem !== null) {
+			return false;
+		}
+
+		const value = this.serializeItem(nextItem);
+		await this.redis.hset(this.key, nextItem.id, value);
+
+		return true;
+	}
+
+	public async updateItem(nextItem: Item): Promise<boolean> {
+		const id = nextItem.id;
+
+		const prevItem = await this.getItem(id);
+		if (prevItem === null) {
+			return false;
+		}
+		if (prevItem.tweet === 1) {
+			return false;
+		}
+		if (equals(prevItem, nextItem)) {
 			return false;
 		}
 
