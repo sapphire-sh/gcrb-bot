@@ -15,7 +15,7 @@ import {
 export class Tweeter {
 	private readonly twit: Twit[];
 
-	public constructor(config: Twit.Options[]) {
+	public constructor(config: Twit.ConfigKeys[]) {
 		this.twit = config.map(e => new Twit(e));
 	}
 

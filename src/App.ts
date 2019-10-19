@@ -63,6 +63,7 @@ export class App {
 		schedule.scheduleJob('*/5 * * * *', async () => {
 			const date = new Date();
 			console.log('parse', date);
+
 			const startdate = getDateString(date, -DATE_RANGE);
 			const enddate = getDateString(date);
 

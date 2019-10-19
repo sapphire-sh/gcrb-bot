@@ -21,10 +21,6 @@ module.exports = {
 				'test': /\.ts$/,
 				'use': 'ts-loader',
 			},
-			{
-				'test': /\.txt$/,
-				'loader': 'list-loader',
-			},
 		],
 	},
 	'plugins': [
