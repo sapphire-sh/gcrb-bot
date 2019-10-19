@@ -1,6 +1,6 @@
 import {
 	App,
-} from './app';
+} from './App';
 
 (async () => {
 	try {
