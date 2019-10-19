@@ -1,6 +1,6 @@
 import {
 	sendRequest,
-} from '~/helpers';
+} from '../sendRequest';
 
 describe('helpers/sendRequest', () => {
 	test('success', async () => {

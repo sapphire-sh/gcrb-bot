@@ -9,7 +9,7 @@ import {
 
 import {
 	Parser,
-} from '~/libs';
+} from '../Parser';
 
 describe('libs/Parser', () => {
 	test('parsePage', async () => {

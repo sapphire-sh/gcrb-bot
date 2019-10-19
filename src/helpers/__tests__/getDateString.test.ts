@@ -2,7 +2,7 @@ import faker from 'faker';
 
 import {
 	getDateString,
-} from '~/helpers';
+} from '../getDateString';
 
 describe('helpers/getDate', () => {
 	test('success', () => {

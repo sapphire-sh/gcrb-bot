@@ -14,7 +14,7 @@ import {
 
 import {
 	Database,
-} from '~/libs';
+} from '../Database';
 
 describe('libs/Database', () => {
 	function getRandomPlatform(): PlatformType {

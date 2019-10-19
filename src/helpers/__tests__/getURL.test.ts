@@ -6,8 +6,11 @@ import {
 
 import {
 	getDateString,
-	getURL,
 } from '~/helpers';
+
+import {
+	getURL,
+} from '../getURL';
 
 describe('helpers/getURL', () => {
 	test('success', () => {

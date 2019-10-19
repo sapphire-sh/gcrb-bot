@@ -1,7 +1,10 @@
 import {
-	copy,
 	equals,
 } from '~/helpers';
+
+import {
+	copy,
+} from '../copy';
 
 describe('helpers/copy', () => {
 	test('success', () => {

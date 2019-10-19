@@ -2,7 +2,7 @@ import faker from 'faker';
 
 import {
 	composeTweet,
-} from '~/helpers';
+} from '../composeTweet';
 
 describe('helpers/composeTweet', () => {
 	test('success', () => {
