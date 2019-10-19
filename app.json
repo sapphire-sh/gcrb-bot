@@ -1,4 +1,0 @@
-{
-	"name": "@gcrb_bot",
-	"script": "./dist/main.js"
-}

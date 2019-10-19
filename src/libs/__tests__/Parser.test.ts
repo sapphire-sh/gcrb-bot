@@ -1,4 +1,8 @@
 import {
+	PlatformType,
+} from '~/constants';
+
+import {
 	getURL,
 	sendRequest,
 } from '~/helpers';
@@ -13,7 +17,7 @@ describe('libs/Parser', () => {
 
 		const startdate = '2016-09-27';
 		const enddate = '2016-09-29';
-		const platform = '03';
+		const platform = PlatformType.CONSOLE;
 		const page = 0;
 
 		const url = getURL({

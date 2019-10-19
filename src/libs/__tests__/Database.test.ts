@@ -1,6 +1,10 @@
 import faker from 'faker';
 
 import {
+	PlatformType,
+} from '~/constants';
+
+import {
 	Item,
 } from '~/models';
 
@@ -13,8 +17,14 @@ import {
 } from '~/libs';
 
 describe('libs/Database', () => {
+	function getRandomPlatform(): PlatformType {
+		const types = Object.values(PlatformType);
+		const idx = faker.random.number(types.length);
+		return types[idx];
+	}
+
 	const id = faker.random.uuid();
-	const platform = faker.random.number();
+	const platform = getRandomPlatform();
 	const prevItem: Item = {
 		id,
 		date: faker.date.recent().toString(),
@@ -57,7 +67,7 @@ describe('libs/Database', () => {
 				id: faker.random.uuid(),
 				date: faker.date.recent().toString(),
 				title: faker.random.uuid(),
-				platform: faker.random.number(),
+				platform: getRandomPlatform(),
 				applicant: faker.random.uuid(),
 				rating: faker.random.number(),
 				code: faker.random.uuid(),

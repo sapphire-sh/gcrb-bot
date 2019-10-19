@@ -1,6 +1,6 @@
 import {
 	DATE_RANGE,
-	PLATFORMS,
+	PlatformType,
 } from '~/constants';
 
 import {
@@ -24,14 +24,12 @@ export class App {
 	public async initialize() {
 		this.database = new Database();
 		this.parser = new Parser();
-		this.tweeter = new Tweeter();
-
-		this.tweeter.initialize(__config);
+		this.tweeter = new Tweeter(__config.twitter);
 
 		this.shouldProcess = true;
 	}
 
-	private async parse(platform: string, startdate: string, enddate: string): Promise<void> {
+	private async parse(platform: PlatformType, startdate: string, enddate: string): Promise<void> {
 		let page = 0;
 		let items = [];
 		do {
@@ -68,7 +66,7 @@ export class App {
 			const startdate = getDateString(date, -DATE_RANGE);
 			const enddate = getDateString(date);
 
-			for (const platform of PLATFORMS) {
+			for (const platform of Object.values(PlatformType)) {
 				await this.parse(platform, startdate, enddate);
 				await this.tweet(platform);
 			}

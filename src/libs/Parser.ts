@@ -1,6 +1,7 @@
 import cheerio from 'cheerio';
 
 import {
+	PlatformType,
 	RATINGS,
 } from '~/constants';
 
@@ -9,7 +10,7 @@ import {
 } from '~/models';
 
 export class Parser {
-	public parseItem($: CheerioStatic, e: CheerioElement, platform: string): Item | null {
+	public parseItem($: CheerioStatic, e: CheerioElement, platform: PlatformType): Item | null {
 		try {
 			const column = $(e).find('td').toArray();
 
@@ -21,16 +22,7 @@ export class Parser {
 			const code = $(column[4]).text().trim();
 			const tweet = 0;
 
-			return {
-				id,
-				date,
-				title,
-				applicant,
-				rating,
-				platform,
-				code,
-				tweet,
-			};
+			return { id, date, title, applicant, rating, platform, code, tweet };
 		}
 		catch (error) {
 			console.log(error);
@@ -38,7 +30,7 @@ export class Parser {
 		}
 	}
 
-	public async parsePage(body: string, platform: string): Promise<Item[]> {
+	public async parsePage(body: string, platform: PlatformType): Promise<Item[]> {
 		const $ = cheerio.load(body);
 
 		const items: Item[] = [];

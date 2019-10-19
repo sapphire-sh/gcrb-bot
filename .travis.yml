@@ -6,7 +6,6 @@ node_js:
 sudo: false
 
 script:
-  - cp config.sample.js config.js
   - npm run test
 
 notifications:
