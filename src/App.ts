@@ -6,6 +6,10 @@ import {
 } from '~/constants';
 
 import {
+	Item,
+} from '~/models';
+
+import {
 	Database,
 	Parser,
 	Tweeter,
@@ -22,19 +26,19 @@ import {
 export class App {
 	public readonly database: Database;
 	public readonly parser: Parser;
-	public readonly tweeter: Tweeter;
 	public readonly server: Server;
+	public readonly tweeter: Tweeter;
 
 	public constructor() {
 		this.database = new Database();
 		this.parser = new Parser();
-		this.tweeter = new Tweeter(__config.twitter);
 		this.server = new Server();
+		this.tweeter = new Tweeter(__config.twitter);
 	}
 
 	private async parse(platform: PlatformType, startdate: string, enddate: string): Promise<void> {
 		let page = 0;
-		let items = [];
+		let items: Item[] = [];
 		do {
 			const url = getURL({ type: 'search', pageindex: page, enddate, startdate, platform });
 			const body = await sendRequest(url);
@@ -46,7 +50,7 @@ export class App {
 		while (items.length > 0);
 	}
 
-	private async tweet(platform: string) {
+	private async tweet(platform: string): Promise<void> {
 		const items = await this.database.getUntweetedItems(platform);
 		for (const item of items) {
 			if (__test === false) {
