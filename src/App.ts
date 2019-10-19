@@ -56,7 +56,6 @@ export class App {
 			item.tweet = 1;
 			await this.database.insertItem(item);
 		}
-		await sleep(__test ? 0 : 5 * 60 * 1000);
 	}
 
 	public async start() {
