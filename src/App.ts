@@ -7,6 +7,7 @@ import {
 	Database,
 	Parser,
 	Tweeter,
+	Server,
 } from '~/libs';
 
 import {
@@ -16,15 +17,17 @@ import {
 } from '~/helpers';
 
 export class App {
-	public database: Database | null = null;
-	public parser: Parser | null = null;
-	public tweeter: Tweeter | null = null;
+	public readonly database: Database;
+	public readonly parser: Parser;
+	public readonly tweeter: Tweeter;
+	public readonly server: Server;
 	private shouldProcess: boolean = false;
 
-	public async initialize() {
+	public constructor() {
 		this.database = new Database();
 		this.parser = new Parser();
 		this.tweeter = new Tweeter(__config.twitter);
+		this.server = new Server();
 
 		this.shouldProcess = true;
 	}
