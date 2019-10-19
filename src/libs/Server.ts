@@ -29,7 +29,7 @@ export class Server {
 			res.json(true);
 		});
 
-		this.server = this.app.listen(80);
+		this.server = this.app.listen(5101);
 	}
 
 	protected async getItems(): Promise<Item[]> {

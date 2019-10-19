@@ -6,7 +6,7 @@ services:
     environment:
       - REDIS_HOST=redis
     ports:
-      - 5101:80
+      - 5101:5101
     networks:
       - redis
     depends_on:
