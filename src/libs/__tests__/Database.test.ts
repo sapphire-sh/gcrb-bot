@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import faker from 'faker';
 
 import {
@@ -9,7 +11,6 @@ import {
 } from '~/models';
 
 import {
-	copy,
 	getDateString,
 } from '~/helpers';
 
@@ -72,7 +73,7 @@ describe('libs/Database', () => {
 		});
 
 		test('failure - duplicate', async () => {
-			const item = copy(prevItem);
+			const item = _.cloneDeep(prevItem);
 
 			const res = await database.insertItem(item);
 			expect(res).toBe(false);
@@ -82,9 +83,36 @@ describe('libs/Database', () => {
 		});
 	});
 
+	describe('getItems', () => {
+		test('success', async () => {
+			const items = await database.getItems();
+			expect(items).toHaveLength(1);
+			expect(items).toContainEqual(prevItem);
+		});
+	});
+
+	describe('getUntweetedItems', () => {
+		test('success', async () => {
+			const items = await database.getUntweetedItems(platform);
+			expect(items).toHaveLength(1);
+			expect(items[0]).toEqual(prevItem);
+		});
+
+		test('success - no items', async () => {
+			const item = _.cloneDeep(prevItem);
+			item.tweet = 1;
+
+			const res = await database.updateItem(item);
+			expect(res).toBe(true);
+
+			const items = await database.getUntweetedItems(platform);
+			expect(items).toHaveLength(0);
+		});
+	});
+
 	describe('updateItem', () => {
 		test('success', async () => {
-			const item = copy(prevItem);
+			const item = _.cloneDeep(prevItem);
 			item.tweet = 1;
 
 			const res = await database.updateItem(item);
@@ -96,7 +124,7 @@ describe('libs/Database', () => {
 		});
 
 		test('failure', async () => {
-			const item = copy(prevItem);
+			const item = _.cloneDeep(prevItem);
 			item.tweet = 1;
 
 			{
@@ -111,25 +139,6 @@ describe('libs/Database', () => {
 			const nextItem = await database.getItem(prevItem.id);
 			expect(nextItem).not.toBeNull();
 			expect(nextItem!.tweet).toBe(1);
-		});
-	});
-
-	describe('getUntweetedItems', () => {
-		test('success', async () => {
-			const items = await database.getUntweetedItems(platform);
-			expect(items).toHaveLength(1);
-			expect(items[0]).toEqual(prevItem);
-		});
-
-		test('success - no items', async () => {
-			const item = copy(prevItem);
-			item.tweet = 1;
-
-			const res = await database.updateItem(item);
-			expect(res).toBe(true);
-
-			const items = await database.getUntweetedItems(platform);
-			expect(items).toHaveLength(0);
 		});
 	});
 });

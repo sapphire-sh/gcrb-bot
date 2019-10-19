@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import IORedis from 'ioredis';
 
 import IORedisMock from 'ioredis-mock';
@@ -7,7 +9,8 @@ import {
 } from '~/models';
 
 import {
-	equals,
+	serializeItem,
+	deserializeItem,
 } from '~/helpers';
 
 export class Database {
@@ -23,25 +26,11 @@ export class Database {
 	}
 
 	public get key() {
-		return `gcrb_bot`;
+		return 'gcrb_bot';
 	}
 
 	public async flush() {
 		await this.redis.flushall();
-	}
-
-	public serializeItem(item: Item): string {
-		return JSON.stringify(item);
-	}
-
-	public deserializeItem(value: string): Item | null {
-		try {
-			const item = JSON.parse(value);
-			return item;
-		}
-		catch {
-			return null;
-		}
 	}
 
 	public async getItem(id: string): Promise<Item | null> {
@@ -50,14 +39,19 @@ export class Database {
 		if (res === null) {
 			return null;
 		}
-		return this.deserializeItem(res);
+		return deserializeItem(res);
 	}
 
 	public async getItems(): Promise<Item[]> {
 		const res: { [key: string]: string; } = await this.redis.hgetall(this.key);
 
-		const items = Object.values(res).map(x => this.deserializeItem(x));
+		const items = Object.values(res).map(x => deserializeItem(x));
 		return items.filter((x): x is Item => x !== null);
+	}
+
+	public async getUntweetedItems(platform: string): Promise<Item[]> {
+		const items = await this.getItems();
+		return items.filter((x): x is Item => x !== null).filter(x => x.platform === platform).filter(x => x.tweet === 0);
 	}
 
 	public async insertItem(nextItem: Item): Promise<boolean> {
@@ -68,7 +62,7 @@ export class Database {
 			return false;
 		}
 
-		const value = this.serializeItem(nextItem);
+		const value = serializeItem(nextItem);
 		await this.redis.hset(this.key, nextItem.id, value);
 
 		return true;
@@ -84,18 +78,13 @@ export class Database {
 		if (prevItem.tweet === 1) {
 			return false;
 		}
-		if (equals(prevItem, nextItem)) {
+		if (_.isEqual(prevItem, nextItem)) {
 			return false;
 		}
 
-		const value = this.serializeItem(nextItem);
+		const value = serializeItem(nextItem);
 		await this.redis.hset(this.key, nextItem.id, value);
 
 		return true;
-	}
-
-	public async getUntweetedItems(platform: string): Promise<Item[]> {
-		const items = await this.getItems();
-		return items.filter((x): x is Item => x !== null).filter(x => x.platform === platform).filter(x => x.tweet === 0);
 	}
 }
