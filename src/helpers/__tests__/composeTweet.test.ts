@@ -1,4 +1,8 @@
 import {
+	PlatformType,
+} from '~/constants';
+
+import {
 	Item,
 } from '~/models';
 
@@ -13,7 +17,7 @@ describe('helpers/composeTweet', () => {
 		title: 'PS4_Kitchen(키친)',
 		applicant: '게임피아(주)',
 		rating: 3,
-		platform: '03',
+		platform: PlatformType.CONSOLE,
 		code: 'CC-NV-160928-001',
 		tweet: 0,
 	};
