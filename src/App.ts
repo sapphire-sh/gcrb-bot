@@ -1,3 +1,5 @@
+import schedule from 'node-schedule';
+
 import {
 	DATE_RANGE,
 	PlatformType,
@@ -22,15 +24,12 @@ export class App {
 	public readonly parser: Parser;
 	public readonly tweeter: Tweeter;
 	public readonly server: Server;
-	private shouldProcess: boolean = false;
 
 	public constructor() {
 		this.database = new Database();
 		this.parser = new Parser();
 		this.tweeter = new Tweeter(__config.twitter);
 		this.server = new Server();
-
-		this.shouldProcess = true;
 	}
 
 	private async parse(platform: PlatformType, startdate: string, enddate: string): Promise<void> {
@@ -61,19 +60,19 @@ export class App {
 	}
 
 	public async start() {
-		while (this.shouldProcess) {
+		schedule.scheduleJob('*/5 * * * *', async () => {
 			const date = new Date();
+			console.log('parse', date);
 			const startdate = getDateString(date, -DATE_RANGE);
 			const enddate = getDateString(date);
 
 			for (const platform of Object.values(PlatformType)) {
 				await this.parse(platform, startdate, enddate);
+			}
+
+			for (const platform of Object.values(PlatformType)) {
 				await this.tweet(platform);
 			}
-		}
-	}
-
-	public stop() {
-		this.shouldProcess = false;
+		});
 	}
 }
