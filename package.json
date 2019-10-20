@@ -14,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sapphiredev/gcrb_bot.git"
+    "url": "git+https://github.com/sapphiredev/gcrb-bot.git"
   },
   "author": "sapphire",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sapphiredev/gcrb_bot/issues"
+    "url": "https://github.com/sapphiredev/gcrb-bot/issues"
   },
-  "homepage": "https://github.com/sapphiredev/gcrb_bot#readme",
+  "homepage": "https://github.com/sapphiredev/gcrb-bot#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
     "express": "^4.17.1",
