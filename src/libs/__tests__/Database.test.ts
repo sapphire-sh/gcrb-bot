@@ -61,28 +61,6 @@ describe('libs/Database', () => {
 		});
 	});
 
-	describe('insertItem', () => {
-		test('success', async () => {
-			const item = getRandomItem();
-
-			const res = await database.insertItem(item);
-			expect(res).toBe(true);
-
-			const nextItem = await database.getItem(item.id);
-			expect(nextItem).toEqual(item);
-		});
-
-		test('failure - duplicate', async () => {
-			const item = _.cloneDeep(prevItem);
-
-			const res = await database.insertItem(item);
-			expect(res).toBe(false);
-
-			const nextItem = await database.getItem(item.id);
-			expect(nextItem).toEqual(prevItem);
-		});
-	});
-
 	describe('getItems', () => {
 		test('success', async () => {
 			const items = await database.getItems();
@@ -107,6 +85,28 @@ describe('libs/Database', () => {
 
 			const items = await database.getUntweetedItems(platform);
 			expect(items).toHaveLength(0);
+		});
+	});
+
+	describe('insertItem', () => {
+		test('success', async () => {
+			const item = getRandomItem();
+
+			const res = await database.insertItem(item);
+			expect(res).toBe(true);
+
+			const nextItem = await database.getItem(item.id);
+			expect(nextItem).toEqual(item);
+		});
+
+		test('failure - duplicate', async () => {
+			const item = _.cloneDeep(prevItem);
+
+			const res = await database.insertItem(item);
+			expect(res).toBe(false);
+
+			const nextItem = await database.getItem(item.id);
+			expect(nextItem).toEqual(prevItem);
 		});
 	});
 

@@ -59,6 +59,7 @@ export class App {
 			}
 			item.tweet = 1;
 			await this.database.insertItem(item);
+			await sleep(1000);
 		}
 	}
 
@@ -74,9 +75,7 @@ export class App {
 				await this.parse(platform, startdate, enddate);
 			}
 
-			for (const platform of Object.values(PlatformType)) {
-				await this.tweet(platform);
-			}
+			await Promise.all(Object.values(PlatformType).map(x => this.tweet(x)));
 		});
 	}
 }
