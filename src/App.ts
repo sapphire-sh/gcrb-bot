@@ -58,7 +58,7 @@ export class App {
 				await this.tweeter.tweetItem(item);
 			}
 			item.tweet = 1;
-			await this.database.insertItem(item);
+			await this.database.updateItem(item);
 			await sleep(1000);
 		}
 	}
