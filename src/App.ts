@@ -53,13 +53,18 @@ export class App {
 	private async tweet(platform: string): Promise<void> {
 		const items = await this.database.getUntweetedItems(platform);
 		for (const item of items) {
-			if (__test === false) {
-				await sleep(5000);
-				await this.tweeter.tweetItem(item);
+			try {
+				if (__test === false) {
+					await sleep(5000);
+					await this.tweeter.tweetItem(item);
+				}
+				item.tweet = 1;
+				await this.database.updateItem(item);
+				await sleep(1000);
 			}
-			item.tweet = 1;
-			await this.database.updateItem(item);
-			await sleep(1000);
+			catch (error) {
+				console.log(error);
+			}
 		}
 	}
 

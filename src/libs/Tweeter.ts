@@ -35,12 +35,7 @@ export class Tweeter {
 	}
 
 	public async tweetItem(item: Item): Promise<void> {
-		try {
-			const status = composeTweet(item);
-			await this.tweet(item.platform, status);
-		}
-		catch (error) {
-			console.log(error);
-		}
+		const status = composeTweet(item);
+		await this.tweet(item.platform, status);
 	}
 }
