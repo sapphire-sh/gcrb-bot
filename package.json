@@ -45,7 +45,7 @@
     "@types/request-promise": "^4.1.44",
     "@types/supertest": "^2.0.8",
     "@types/twit": "^2.2.23",
-    "codecov": "^3.6.1",
+    "codecov": "^3.6.5",
     "faker": "^4.1.0",
     "ioredis-mock": "^4.18.0",
     "jest": "^24.9.0",
